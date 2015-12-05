@@ -3,6 +3,9 @@
 import sys
 import os
 
+def file_type(path):
+    return os.popen('file -b --mime-type "%s"' % path, 'r').read()
+
 def str_reverse(s):
     rev = ''
     for c in s:
@@ -13,14 +16,23 @@ class File:
     def __init__(self, path):
         self.path = path
         self.rev = str_reverse(path)
+        self.mime_type = file_type(path)
 
     def __cmp__(self, other):
+        # Group by mime type
+        if self.mime_type < other.mime_type:
+            return -1
+        elif self.mime_type > other.mime_type:
+            return 1
+
+        # Group by reverse filename
         if self.rev < other.rev:
             return -1
         elif self.rev > other.rev:
             return 1
-        else:
-            return 0
+
+        # Consider as equal
+        return 0
 
 def list_dir(path):
     all_dirs = []
