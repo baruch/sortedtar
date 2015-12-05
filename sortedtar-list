@@ -1,3 +1,3 @@
 #!/bin/sh
 
-find "$1" | rev | sort | rev
+find $@ | rev | sort | rev
