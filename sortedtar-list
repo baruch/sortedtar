@@ -1,3 +1,51 @@
-#!/bin/sh
+#!/usr/bin/env python
 
-find $@ | rev | sort | rev
+import sys
+import os
+
+def list_dir(path):
+    all_dirs = []
+    all_files = []
+    for root, dirs, files in os.walk(path):
+        all_dirs.extend([os.path.join(root, d) for d in dirs])
+        all_files.extend([os.path.join(root, f) for f in files])
+    return (all_dirs, all_files)
+
+def list_all(paths):
+    all_dirs = []
+    all_files = []
+
+    for path in paths:
+        dirs, files = list_dir(path)
+        all_dirs.extend(dirs)
+        all_files.extend(files)
+
+    return (all_dirs, all_files)
+
+def str_reverse(s):
+    rev = ''
+    for c in s:
+        rev = c + rev
+    return rev
+
+def filename_compare(x, y):
+    xrev = str_reverse(x)
+    yrev = str_reverse(y)
+    if xrev > yrev:
+        return 1
+    elif xrev < yrev:
+        return -1
+    else:
+        return 0
+
+def main():
+    dirs, files = list_all(sys.argv[1:])
+
+    for d in dirs:
+        print d
+    files.sort(cmp=filename_compare)
+    for f in files:
+        print f
+
+if __name__ == '__main__':
+        main()
