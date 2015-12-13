@@ -312,7 +312,7 @@ def list_dir(path):
     all_files = []
     for root, dirs, files in os.walk(path):
         all_dirs.extend([os.path.join(root, d) for d in dirs])
-        all_files.extend(pool.map(File, [os.path.join(root, f) for f in files], 1))
+        all_files.extend([pool.apply_async(File, (os.path.join(root, f),)) for f in files])
     return (all_dirs, all_files)
 
 def list_all(paths):
@@ -331,6 +331,7 @@ def main():
 
     for d in dirs:
         print d
+    files = [f.get() for f in files]
     files.sort()
     for f in files:
         print f.path
