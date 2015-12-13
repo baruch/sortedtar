@@ -2,6 +2,7 @@
 
 import sys
 import os
+from multiprocessing import Pool
 
 ##################### MAGIC
 import glob
@@ -273,8 +274,6 @@ MAGIC_NO_CHECK_TOKENS = 0x100000 # Don't check ascii/tokens#####################
 
 ####### Magic done
 
-
-
 def file_type(path):
     return from_file(path, mime=True)
 
@@ -306,12 +305,14 @@ class File:
         # Consider as equal
         return 0
 
+pool = Pool(16)
+
 def list_dir(path):
     all_dirs = []
     all_files = []
     for root, dirs, files in os.walk(path):
         all_dirs.extend([os.path.join(root, d) for d in dirs])
-        all_files.extend([File(os.path.join(root, f)) for f in files])
+        all_files.extend(pool.map(File, [os.path.join(root, f) for f in files], 1))
     return (all_dirs, all_files)
 
 def list_all(paths):
